@@ -1,54 +1,73 @@
 #include <stdio.h>
 
-#define TAMANHO 10   // Tamanho fixo do tabuleiro 10x10
-#define TAM_NAVIO 3  // Tamanho fixo de cada navio
+#define TAMANHO 10   // Tamanho fixo do tabuleiro (10x10)
+#define TAM_NAVIO 3  // Tamanho fixo dos navios (3 posições)
+
+// Função auxiliar para posicionar navios
+void posicionarNavio(int tabuleiro[TAMANHO][TAMANHO], int linha, int coluna, int orientacao) {
+    /*
+       Orientação:
+       0 = horizontal (esquerda -> direita)
+       1 = vertical (cima -> baixo)
+       2 = diagonal principal (↘, linha++ / coluna++)
+       3 = diagonal secundária (↙, linha++ / coluna--)
+    */
+
+    for (int k = 0; k < TAM_NAVIO; k++) {
+        int novaLinha = linha;
+        int novaColuna = coluna;
+
+        if (orientacao == 0) {            // Horizontal
+            novaColuna = coluna + k;
+        } else if (orientacao == 1) {     // Vertical
+            novaLinha = linha + k;
+        } else if (orientacao == 2) {     // Diagonal principal (↘)
+            novaLinha = linha + k;
+            novaColuna = coluna + k;
+        } else if (orientacao == 3) {     // Diagonal secundária (↙)
+            novaLinha = linha + k;
+            novaColuna = coluna - k;
+        }
+
+        // Validação de limites do tabuleiro
+        if (novaLinha < TAMANHO && novaLinha >= 0 &&
+            novaColuna < TAMANHO && novaColuna >= 0) {
+            
+            // Validação de sobreposição: só posiciona se não tiver outro navio
+            if (tabuleiro[novaLinha][novaColuna] == 0) {
+                tabuleiro[novaLinha][novaColuna] = 3;
+            }
+        }
+    }
+}
 
 int main() {
     // ---------- Declaração do Tabuleiro ----------
     int tabuleiro[TAMANHO][TAMANHO];
 
     // ---------- Inicialização do Tabuleiro ----------
-    // Todas as posições começam com 0 (água)
     for (int i = 0; i < TAMANHO; i++) {
         for (int j = 0; j < TAMANHO; j++) {
-            tabuleiro[i][j] = 0;
+            tabuleiro[i][j] = 0; // 0 = água
         }
     }
 
-    // ---------- Definição das Coordenadas ----------
-    // Navio 1: Horizontal (linha 2, coluna inicial 4)
-    int navio1_linha = 2;
-    int navio1_coluna_inicial = 4;
+    // ---------- Posicionamento dos Navios ----------
+    // Dois navios "clássicos" (horizontal e vertical)
+    posicionarNavio(tabuleiro, 2, 1, 0); // Navio horizontal começando na (2,1)
+    posicionarNavio(tabuleiro, 5, 4, 1); // Navio vertical começando na (5,4)
 
-    // Navio 2: Vertical (linha inicial 5, coluna 7)
-    int navio2_linha_inicial = 5;
-    int navio2_coluna = 7;
-
-    // ---------- Posicionamento do Navio Horizontal ----------
-    for (int k = 0; k < TAM_NAVIO; k++) {
-        // Validação: garantir que não ultrapasse o limite do tabuleiro
-        if (navio1_coluna_inicial + k < TAMANHO) {
-            tabuleiro[navio1_linha][navio1_coluna_inicial + k] = 3;
-        }
-    }
-
-    // ---------- Posicionamento do Navio Vertical ----------
-    for (int k = 0; k < TAM_NAVIO; k++) {
-        // Validação: garantir que não ultrapasse o limite do tabuleiro
-        // e que não sobreponha o navio horizontal
-        if (navio2_linha_inicial + k < TAMANHO &&
-            tabuleiro[navio2_linha_inicial + k][navio2_coluna] == 0) {
-            tabuleiro[navio2_linha_inicial + k][navio2_coluna] = 3;
-        }
-    }
+    // Dois navios diagonais
+    posicionarNavio(tabuleiro, 0, 0, 2); // Navio diagonal principal (↘) a partir de (0,0)
+    posicionarNavio(tabuleiro, 3, 9, 3); // Navio diagonal secundária (↙) a partir de (3,9)
 
     // ---------- Exibição do Tabuleiro ----------
-    printf("=== TABULEIRO BATALHA NAVAL ===\n");
+    printf("=== TABULEIRO BATALHA NAVAL ===\n\n");
     for (int i = 0; i < TAMANHO; i++) {
         for (int j = 0; j < TAMANHO; j++) {
-            printf("%d ", tabuleiro[i][j]); // Exibe cada posição
+            printf("%d ", tabuleiro[i][j]);
         }
-        printf("\n"); // Quebra de linha ao final de cada linha do tabuleiro
+        printf("\n");
     }
 
     return 0;
